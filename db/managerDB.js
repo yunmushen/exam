@@ -46,25 +46,49 @@ module.exports = {
 	getAllChoice(id){
 		var sql = "select * from tbl_exam_choice where subject_id = "+id;
 		return pool.execute(sql);
+	},
+	saveSubject(subject){
+		var sql = "insert into tbl_exam_subject values(null,'"
+		+subject.analysis+"','"
+		+subject.answer+"','"
+		+subject.checkState+"','"
+		+subject.stem+"',"
+		+subject.uploadTime+","
+		+subject.department_id+","
+		+subject.subjectLevel_id+","
+		+subject.subjectType_id+","
+		+subject.topic_id+","
+		+subject.user_id+")";
+		// var sql = "insert into tbl_exam_subject values(null,null,null,null,null,null,"+1+","+1+","+1+","+1+",null)";
+		var connection;
+		var subject_id;
+		pool.getConnection().then(function(conn){
+			connection=conn;
+			conn.query(sql,function(err,results){
+				if(!err){
+					subject_id = results.insertId;
+					// console.log(subject_id);
+					var sql2="";
+					subject.correct.forEach(function(item,index){
+						sql2+="insert into tbl_exam_choice values(null,'"+subject.content[index]+"',"+item+","+subject_id+");"
+					});
+					console.log("sql2",sql2);
+					return pool.execute(sql2);
+					
+				}else{
+					console.log("conn",err);
+				}
+			})
+		}).catch(function(err){
+			console.log(err);
+		}).finally(function(){
+			if(connection){
+				connection.release();
+			}
+		});
+		
+		// return pool.execute(sql2);
+
 	}
-	/*saveSubject(Subject){
-		var sql = "declare @id int"
-		+"insert into tbl_exam_subject values(null,'"
-		+Subject.analysis+"','"
-		+Subject.answer+"','"
-		+Subject.checkState+"','"
-		+Subject.stem+"','"
-		+Subject.uploadTime+"',"
-		+Subject.department_id+","
-		+Subject.subjectLevel_id+","
-		+Subject.subjectType_id+","
-		+Subject.topic_id+","
-		+Subject.user_id+")"+"insert into tbl_exam_subject values(null,'"
-		+Subject.analysis+"','"
-		+Subject.answer+"',"+@@identity+")";
-
-		pool.execute(sql);
-
-	}*/
 
 }

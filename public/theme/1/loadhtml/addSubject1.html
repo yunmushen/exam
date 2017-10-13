@@ -6,7 +6,7 @@
 </style>
 <script type="text/javascript">
 $(function(){
-	//初始化页面
+	/*//初始化页面
 	//题目
 	  $.getJSON("http://172.16.0.5:7777/test/exam/manager/getAllSubjectType.action",function(data){
 		     $("select[name='type']").empty();
@@ -62,10 +62,7 @@ $(function(){
 			   })  	
 		})
 		
-		/*$(document).ready(function(){
-			$("select[name='department']").children("option").eq(0).trigger("click")
-			 
-			})*/
+		
 		//给题目添加事件  使得改变的时候能够跟换下
 			  $(".Attributecontent_left select[name='type']").off("change");
 		      $(".Attributecontent_left select[name='type']").on("change",function(event){
@@ -94,7 +91,7 @@ $(function(){
 					 }
 			  })
 
-
+*/
 
 
 	//点击差号的时候跳回到allsubject页面
@@ -102,9 +99,9 @@ $(function(){
 	    $(".deletetitle").on("click",function(){
 			var url =$(".baseUI>li>ul>li").hasClass("current").attr("url");
 			alert(url);
-		   $(".right").load("loadhtml/allsubject.html");
+		   $(".right").load("theme/1/loadhtml/showSubjects.html");
 		})
-
+/*
 		//点击保存并继续
 	$("form[name='subjectAddForm']").off("submit");
 	$("form[name='subjectAddForm']").on("submit",function(){
@@ -166,7 +163,7 @@ $(function(){
 		//load    allSubject.html
 	});
 })
-  
+*/  
 
 
 

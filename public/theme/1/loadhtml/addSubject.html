@@ -13,29 +13,29 @@
                     
                 	<div class="c_editview">
                     	<div class="Attribute">
-                             <div class="Attributetit">题目属性</div>
-                             <div class="Attributecontent">
-                                 <div class="Attributecontent_left">
-                                     <b>
+                            <div class="Attributetit">题目属性</div>
+                            <div class="Attributecontent">
+                                <div class="Attributecontent_left">
+                                    <b>
                                      	题型：<select name="type">
                                        	</select>
-                                     </b>
-                                     <b>
+                                    </b>
+                                    <b>
                                      	方向：<select name="department">
                                      		
                                        	</select>
-                                     </b>
-                                     <b>
+                                    </b>
+                                    <b>
                                      	难度：<select name="level">
                                      		
                                        	</select>
-                                     </b>
-                                     <b>
+                                    </b>
+                                    <b>
                                      	知识点：<select name="topic">
                                         </select>
-                                     </b> 
-                                 </div>              
-                             </div>
+                                    </b> 
+                                </div>              
+                            </div>
                         </div>
                         <div class="Problem">
                             <div class="Attributetit">题目题干</div>
@@ -51,7 +51,7 @@
                             <div class="Answercontent">
                             	<!--选项-->
                                 <div class="Answerpart">
-                                     <div class="Answerpart_left">
+                                    <div class="Answerpart_left">
                                          <p>A</p><span>
                                          <input type="radio" name="answer"/></span>
                                      </div>
@@ -109,12 +109,6 @@
                             	<textarea name="analysis"></textarea> 
                             </div>
                         </div>
-                        <!--
-                        <div class="Problem">
-                            <div class="fistproblm"><span>1.</span><a href="#"></a></div>
-                            <div class="Problemcontent"></div>
-                        </div>
-                        -->
                         <div class="btn_left">
                             <span class="btnL"><em class="btnR saveContinue">保存并继续</em></span>
                             <span class="btnL"><em class="btnR saveClose">保存并关闭</em></span>
@@ -128,10 +122,121 @@
 
 			//点击右上角×号，返回第一个页面
 			$(".deletetitle").click(function(){
-				$(".right").load("theme/1/loadhtml/rightallTimu.html");
+				$(".right").load("theme/1/loadhtml/showSubjects.html");
 			})
+		//从数据库中获取选择框里要显示的数据
+			$.getJSON("manager/getAllSubjectType",function(data){
+				data.forEach(function(item){
+					var newOpt = '<option id="'+item.id+'" name="'+item.realName+'">'+item.realName+'</option>';
+					$(".Attributecontent_left").find("select[name='type']").append(newOpt);
+				});
+			});
+			$.getJSON("manager/getAllDepartmentes",function(data){
+				data.forEach(function(item){
+					var newOpt = '<option id="'+item.id+'" name="'+item.name+'">'+item.name+'</option>';
+					$(".Attributecontent_left").find("select[name='department']").append(newOpt);
+				});
+			});
+			$.getJSON("manager/getAllSubjectLevel",function(data){
+				data.forEach(function(item){
+					var newOpt = '<option id="'+item.id+'" name="'+item.realName+'">'+item.realName+'</option>';
+					$(".Attributecontent_left").find("select[name='level']").append(newOpt);
+					
+				});			
+			});
+			$.getJSON("manager/getAllTopics",function(data){
+				data.forEach(function(item){
+					var newOpt = '<option id="'+item.id+'" name="'+item.title+'">'+item.title+'</option>';
+					$(".Attributecontent_left").find("select[name='topic']").append(newOpt);
+				});
+			});
+			/*
+			//获取该方向的知识点
+			if(department_id){
+				$("select[name='topic']").empty();
+				$.getJSON("manager/getDepartmentTopics?id="+department_id,function(data){
+					data.forEach(function(item){
+						var newOpt = '<option id="'+item.id+'" name="'+item.title+'">'+item.title+'</option>';
+						$(".Attributecontent_left").find("select[name='topic']").append(newOpt);
+					});
+				});
+			}*/
+		//获取所选中的option的id
+			var type_id=1;
+			var department_id=1;
+			var level_id=1;
+			var topic_id=1;
+		//将获取到的数据发送到后台获取数据库中数据
+			$(".Attributecontent_left").on("click","select",function(){
+				console.log(this);
+				switch($(this).attr("name")){
+					case "type":type_id = $(this).find("option:selected").attr("id");
+						break;
+					case "department":department_id = $(this).find("option:selected").attr("id");
+						break;
+					case "level":level_id = $(this).find("option:selected").attr("id");
+						break;
+					case "topic":topic_id = $(this).find("option:selected").attr("id");
+						break;
+				}
+				// console.log(department_id);
+				// console.log(type_id,department_id,level_id,topic_id);
+				//将input的类型随类型Select所选中的类型变化
+				switch(type_id){
+					case "1":$(".Answerpart_left").find("input").attr("type","radio");
+						$(".Answeroptions").removeAttr("hidden");
+						$(".Problem").eq(1).addClass("chapterAnswer");
+						break;
+					case "2":$(".Answerpart_left").find("input").attr("type","checkbox");
+						$(".Answeroptions").removeAttr("hidden");
+						$(".Problem").eq(1).addClass("chapterAnswer");
+						break;
+					case "3":$(".Answeroptions").attr("hidden","hidden");
+						$(".Problem").removeClass("chapterAnswer");
+						break;
+				}
+				console.log("onclick",type_id,department_id,level_id,topic_id);
+				
+			})
+
+		//点击添加选项添加选项
+			var n=0;
+			$(".icon_r").on("click",function(){
+				var num = String.fromCharCode(n+69);
+				var newDiv = $(".Answerpart").eq(0).clone();
+				newDiv.find(".Answerpart_left>p").html(num);
+				$(".Answercontent").append(newDiv);
+				console.log(newDiv);
+				n++;
+			})
+
+		//保存并继续
+			$(".btn_left").on("click",".btnL:first-child",function(){
+				// console.log(this);
+				// location.reload();
+				saveSubject();
+				// $(".right").load("theme/1/loadhtml/addSubject.html");
+
+			});
+			$(".btn_left").on("click",".btnL:last-child",function(){
+				// location.reload();
+
+			});
+			// arr.forEach(function(item){
+			// 	switch($(item).attr("name")){
+			// 		case "type":type_id = 
+			// 			break;
+			// 		case "department":
+			// 			break;
+			// 		case "level":
+			// 			break;
+			// 		case "topic":
+			// 			break;
+
+			// 	}
+			// });
 			
-			//从后台拿出来下拉列表中的内容
+		/*//从后台拿出来下拉列表中的内容
 			//获取题型数据
 			// $.getJSON("theme/json/types.json",function(data){
 			$.getJSON("manager/getAllSubjectType",function(data){
@@ -164,11 +269,6 @@
 					$("select:eq(1)").children("option").eq(0).trigger("click");
 					// $("select:eq(1)").children("option").eq(1).attr("selected","selected");
 				})
-				
-
-
-
-
 	//使用代理去绑定事件，事件代理，解决异步加载问题
 			$("select:eq(1)").on("click","option",function(event){
 				var  id =$(this).attr("id");
@@ -267,8 +367,89 @@
 				$(".saveClose").off("click");
 				$(".saveClose").on("click",function(){
 					$(".deletetitle").trigger("submit");
-				})					
-        })	
+				})	*/				
+			
+        })
+      	function saveSubject(){
+      		var type_id;
+			var department_id;
+			var level_id;
+			var topic_id;
+			//获取题目题干
+      		var stem = $(".Attributetit").eq(1).siblings().find("textarea").val();
+      		var answer;
+      		var arrI = new Array();
+			var arrT = new Array();
+			var arrId = $(".Attributecontent_left").find("select").find("option:selected").get();
+			var analysis = $(".Problem").find("textarea[name='analysis']").val();
+			var checkState = "未审核";
+			var uploadTime = Date.now();
+			// console.log(analysis);
+			arrId.forEach(function(item){
+				switch($(item).parent().attr("name")){
+					case "type":type_id = $(item).attr("id");
+						break;
+					case "department":department_id = $(item).attr("id");
+						break;
+					case "level":level_id = $(item).attr("id");
+						break;
+					case "topic":topic_id = $(item).attr("id");
+						break;
+				}
+			})
+			//获取题目答案
+			if(type_id == "3"){
+				answer = $(".Problem").find("textarea[name='answer']").val();
+			}else{
+				var arrAn = $(".Answerpart_left").get();
+				arrAn.forEach(function(item){
+					// console.log($(item).find("input:checked"))
+
+					if($(item).find("input:checked").length){
+						arrI.push(1);
+						arrT.push($(item).siblings().eq(0).find("textarea").val());
+					}else{
+						arrI.push(0);
+						arrT.push($(item).siblings().eq(0).find("textarea").val());
+					}
+				});
+				// console.log(arrAnswer);
+				// console.log("arrI",arrI);
+				// console.log("arrI",arrT);
+			}
+			if(stem){
+				$.ajax("manager/saveSubject",{
+					method:"POST",
+					data:{
+						"department_id":department_id,
+						"subjectLevel_id":level_id,
+						"subjectType_id":type_id,
+						"topic_id":topic_id,
+						"stem":stem,
+						"answer":answer,
+						"analysis":analysis,
+						"checkState":checkState,
+						"uploadTime":uploadTime,
+						"corrects":arrI,
+						"contents":arrT
+					},
+					success:function(data){
+						console.log(data);
+					}
+				})
+			}else{
+				alert("请填写题目题干");
+			}
+			// console.log(answer);
+			// console.log(type_id,department_id,level_id,topic_id);
+      		
+      		// $.ajax("manager/saveSubject",{
+      		// 	method:"POST",
+      		// 	data:{
+
+      		// 	}
+      		// })
+      	}	
     </script>
     
     

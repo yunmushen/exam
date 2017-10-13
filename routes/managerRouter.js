@@ -76,14 +76,15 @@ router.post('/getAllChoice',(req,resp)=>{
 	});
 });
 
-/*router.post('/saveSubject',(req,resp)=>{
+router.post('/saveSubject',(req,resp)=>{
 	var subject = new Subject();
 	Object.assign(subject,req.body);
-	managerDB.getAllSubjects(subject).then((results)=>{
-		resp.send(results+"插入成功");
+	console.log("routerSubject",subject);
+	managerDB.saveSubject(subject).then((results)=>{
+		resp.send(results);
 	}).catch((err)=>{
 		resp.send(err);
 	});
-});*/
+});
 
 module.exports = router;
