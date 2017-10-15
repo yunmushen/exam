@@ -270,53 +270,82 @@
 			}
 		})
 		//获取题目答案
-		if(type_id == "3"){
-			answer = $(".Problem").find("textarea[name='answer']").val();
-		}else{
-			var arrAn = $(".Answerpart_left").get();
-			arrAn.forEach(function(item){
-				// console.log($(item).find("input:checked"))
-
-				if($(item).find("input:checked").length){
-					arrI.push(1);
-					arrT.push($(item).siblings().eq(0).find("textarea").val());
-				}else{
-					arrI.push(0);
-					arrT.push($(item).siblings().eq(0).find("textarea").val());
-				}
-			});
-			// console.log(arrAnswer);
-			// console.log("arrI",arrI);
-			// console.log("arrI",arrT);
-		}
+		
 		if(stem){
-			$.ajax("manager/saveSubject",{
-				method:"POST",
-				data:{
-					"department_id":department_id,
-					"subjectLevel_id":level_id,
-					"subjectType_id":type_id,
-					"topic_id":topic_id,
-					"stem":stem,
-					"answer":answer,
-					"analysis":analysis,
-					"checkState":checkState,
-					// "uploadTime":uploadTime,
-				},
-				success:function(data){
-					$.ajax("manager/saveChoice",{
-						method:"POST",
-						data:{
-							"subject_id":data.insertId,
-							"corrects":arrI,
-							"contents":arrT
-						},
-						success:function(result){
-							console.log(result);
-						}
-					})
-				}
-			})
+			if(type_id == "3"){
+				answer = $(".Problem").find("textarea[name='answer']").val();
+				$.ajax("manager/saveSubject",{
+					method:"POST",
+					data:{
+						"department_id":department_id,
+						"subjectLevel_id":level_id,
+						"subjectType_id":type_id,
+						"topic_id":topic_id,
+						"stem":stem,
+						"answer":answer,
+						"analysis":analysis,
+						"checkState":checkState,
+						// "uploadTime":uploadTime,
+					},
+					success:function(data){
+						/*$.ajax("manager/saveChoice",{
+							method:"POST",
+							data:{
+								"subject_id":data.insertId,
+								"corrects":arrI,
+								"contents":arrT
+							},
+							success:function(result){
+								console.log(result);
+							}
+						})*/
+					}
+				})
+			}else{
+				var arrAn = $(".Answerpart_left").get();
+				arrAn.forEach(function(item){
+					// console.log($(item).find("input:checked"))
+
+					if($(item).find("input:checked").length){
+						arrI.push(1);
+						arrT.push($(item).siblings().eq(0).find("textarea").val());
+					}else{
+						arrI.push(0);
+						arrT.push($(item).siblings().eq(0).find("textarea").val());
+					}
+				});
+				$.ajax("manager/saveSubject",{
+					method:"POST",
+					data:{
+						"department_id":department_id,
+						"subjectLevel_id":level_id,
+						"subjectType_id":type_id,
+						"topic_id":topic_id,
+						"stem":stem,
+						"answer":answer,
+						"analysis":analysis,
+						"checkState":checkState,
+						// "uploadTime":uploadTime,
+					},
+					success:function(data){
+						$.ajax("manager/saveChoice",{
+							method:"POST",
+							data:{
+								"subject_id":data.insertId,
+								"corrects":arrI,
+								"contents":arrT
+							},
+							success:function(result){
+								console.log(result);
+							}
+						})
+					}
+				})
+				// console.log(arrAnswer);
+				// console.log("arrI",arrI);
+				// console.log("arrI",arrT);
+			}
+			
 		}else{
 			alert("请填写题目题干");
 		}
