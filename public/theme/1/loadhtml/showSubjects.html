@@ -29,7 +29,7 @@
             <div class="Catalog_right">
             	<div id="title">
                    <div class="Catalogtitle">总计
-	                   	<em></em>道题&nbsp;&nbsp;提示：单击体面可显示答案和解析&nbsp;&nbsp;
+	                   	<em></em>道题&nbsp;&nbsp;提示：单击题面可显示答案和解析&nbsp;&nbsp;
 	                   	<input type="checkbox" />
 	                   	<b>显示答案和解析</b>&nbsp;&nbsp;
 	                   	<a href="#" class="Thispage">本页全部试题加入试卷</a>
@@ -132,7 +132,38 @@
 		});
 
 	//给所有的a绑定一个click事件，并拿到选中的id，发送到后台
-		var arr=new Array();
+		
+		// console.log("ajax");
+		getData();
+		//点击单个添加题目，跳进去添加题目的界面
+		$(".c_condition .icon_add").click(function(){
+			$(".right").load("theme/1/loadhtml/addSubject.html");
+		})
+		var count=0;
+		console.log($(".title").find("input[type='checkbox']"));
+		$("#title").find("input[type='checkbox']").on("click",function(){
+			count++;
+			$(".Catalog_right").find(".Catalogcontentup").trigger("click");
+			if(count%2!=0){
+				$(".Catalog_rightnei").find("p:last-child").show();
+				$(".Catalog_rightnei").find("p:nth-child(2)").show();
+			}else if(count%2==0){
+				$(".Catalog_rightnei").find("p:last-child").hide();
+				$(".Catalog_rightnei").find("p:nth-child(2)").show();
+
+			}
+			
+		})
+				
+	})
+
+    //获取
+    function getData(){
+    	var arr=new Array();
+		var type=1;
+		var direct=1;
+		var level=1;
+		var topic=1;
 		$(".tablea").off("click");
 		$(".tablea").on("click","a",function(){
 			$(this).addClass("active3").siblings().removeClass("active3");
@@ -146,10 +177,7 @@
 					}
 				}).get();//.get()方法用于将类数组转换为数组对象
 			//console.log(arr);
-			var type="";
-			var direct="";
-			var level="";
-			var topic="";
+			
 			// console.log("arr",arr);
 			arr.forEach(function(item,index){
 				// console.log("item",item);
@@ -169,20 +197,6 @@
 			})
 			// console.log("参数",direct,topic,type,level);
 			//获取数据
-			getData(direct,topic,type,level);
-
-
-		})
-		// console.log("ajax");
-		
-		//点击单个添加题目，跳进去添加题目的界面
-		$(".c_condition .icon_add").click(function(){
-			$(".right").load("theme/1/loadhtml/addSubject.html");
-		})
-	})
-
-    //获取
-    function getData(direct,topic,type,level){
 			$.ajax("manager/getAllSubjects",{
 				method:"POST",
 				data:{
@@ -199,7 +213,7 @@
 					//点击出现答案
 					showP.forEach(function(item,index){
 						$(item).on("click",".Catalogcontentup",function(){
-							$(this).find("p:hidden").removeAttr("hidden");
+							$(this).find("p:nth-child(2)").removeAttr("hidden");
 							if($(this).attr("name") != "简答题"){
 								var id = $(this).attr("id");
 								//获取单选或多选的答案
@@ -210,18 +224,19 @@
 									},
 									success:function(data){
 										// console.log(data);
-										$(".Catalogcontent").eq(index).find(".Catalogcontentup>p:last-child").empty();
+										$(".Catalogcontent").eq(index).find(".Catalogcontentup>p:nth-child(2)").empty();
+										$(".Catalogcontent").eq(index).find(".Catalogcontentup>p:nth-child(2)").removeAttr("style")
 										data.forEach(function(item,n){
 											var newP;
 											var number = String.fromCharCode(n+65);
 											// console.log(item.correct);
-											if(item.correct.data[0] == 1){
+											if(item.correct == 1){
 												// console.log("111");
 												newP = '<br><span id="'+item.id+'" value="'+item.correct+'" style="color:red">'+number+'.'+item.content+'</span>';
-												$(".Catalogcontent").eq(index).find(".Catalogcontentup>p:last-child").append(newP);
+												$(".Catalogcontent").eq(index).find(".Catalogcontentup>p:nth-child(2)").append(newP);
 											}else{												
 												newP = '<br><span id="'+item.id+'" value="'+item.correct+'">'+number+'.'+item.content+'</span>';
-												$(".Catalogcontent").eq(index).find(".Catalogcontentup>p:last-child").append(newP);
+												$(".Catalogcontent").eq(index).find(".Catalogcontentup>p:nth-child(2)").append(newP);
 											}
 											
 										});										
@@ -240,16 +255,20 @@
 						subject_id = $(this).attr("id");
 						subject_checkState = $(this).attr("value");
 						if($(this).attr("value") == "审核通过" || $(this).attr("value") == "审核不通过"){
+							var t = this;
 							var url = "manager/updateSubject";
-							updateSubject(url,subject_id,subject_checkState);
+							updateSubject(url,subject_id,subject_checkState,t);
 						}
 					})
 				}
 		
 			})
+		})
+		$(".tablea a").trigger("click");
+			
 	}
 
-	function updateSubject(url,subject_id,subject_checkState){
+	function updateSubject(url,subject_id,subject_checkState,t){
 		$.ajax(url,{
 			method:"POST",
 			data:{
@@ -258,10 +277,17 @@
 			},
 			success:function(data){
 				if(subject_checkState == "审核通过"){
-					var ele = '<a href="javascript:void(0)" id="'+subject_id+'" hidden>加入试卷</a>';
-					// $(a).find(".Catalogcontentdown").empty();
-					// $(a).find(".Catalogcontentdown").append(ele);
-					// $(ele).siblings().addAttr("display","hidden");
+					var as = $(t).siblings().get();
+					as.forEach(function(item){
+						if($(item).html() == "加入试卷"){
+							$(item).show();
+							// console.log($(item).html());
+						}else{
+							$(item).hide();
+						}
+					});
+					$(t).hide();
+					// console.log(as,t);
 				}
 				alert(subject_checkState);
 				
@@ -280,11 +306,12 @@
                             +'<div class="Catalogcontent">'
                             +'<div class="Catalogcontentup" id="'+item.id+'" name="'+item.stRealName+'">'+item.stRealName
                             +'<p>'+item.stem+'</p>'
-                            +'<p hidden>'+item.answer+'</p>'
+                            +'<p style="color:red" hidden>'+item.answer+'</p><br><br><br>'
+                            +'<p style="color:blue" hidden>'+item.analysis+'</p>'
                             +'</div>'
                             +'<div class="Catalogcontentdown">'
                             +'<a href="javascript:void(0)" id="'+item.id+'" value="审核通过">审核通过</a>'
-                            +'<a href="javascript:void(0)" id="'+item.id+'" hidden>加入试卷</a>'
+                            +'<a href="javascript:void(0)" id="'+item.id+'" style="display:none">加入试卷</a>'
                             +'<a href="javascript:void(0)" id="'+item.id+'" value="审核不通过">审核不通过</a>'
                             +'<a href="javascript:void(0)" id="'+item.id+'">删除题目</a>'
                             +'</div>'
@@ -293,8 +320,7 @@
 
 				$(".Catalog_right>#content").append(newDiv);
 				
-			});
-			
+			});	
 					
      	}
 

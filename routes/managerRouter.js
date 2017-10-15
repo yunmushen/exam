@@ -47,7 +47,7 @@ router.get('/getDepartmentTopics',(req,resp)=>{
 
 router.post('/getAllSubjects',(req,resp)=>{
 	var obj = req.body;
-	console.log(obj);
+	// console.log(obj);
 	managerDB.getAllSubjects(obj["subject.department.id"],obj["subject.topic.id"],obj["subject.subjectType.id"],obj["subject.subjectLevel.id"]).then((results)=>{
 		resp.send(results);
 	}).catch((err)=>{
@@ -68,7 +68,7 @@ router.post('/updateSubject',(req,resp)=>{
 
 router.post('/getAllChoice',(req,resp)=>{
 	var id = req.body.id;
-	console.log("router",req.body);
+	// console.log("router",req.body);
 	managerDB.getAllChoice(id).then((results)=>{
 		resp.send(results);
 	}).catch((err)=>{
@@ -79,7 +79,7 @@ router.post('/getAllChoice',(req,resp)=>{
 router.post('/saveSubject',(req,resp)=>{
 	var subject = new Subject();
 	Object.assign(subject,req.body);
-	console.log("routerSubject",subject);
+	// console.log("routerSubject",subject);
 	managerDB.saveSubject(subject).then((results)=>{
 		resp.send(results);
 	}).catch((err)=>{
@@ -87,4 +87,15 @@ router.post('/saveSubject',(req,resp)=>{
 	});
 });
 
+router.post('/saveChoice',(req,resp)=>{
+	var subject_id = req.body["subject_id"];
+	var corrects = req.body["corrects[]"];
+	var contents = req.body["contents[]"];
+	// console.log("choice",req.body);
+	managerDB.saveChoice(subject_id,corrects,contents).then((results)=>{
+		resp.send(results);
+	}).catch((err)=>{
+		resp.send(err);
+	});
+})
 module.exports = router;

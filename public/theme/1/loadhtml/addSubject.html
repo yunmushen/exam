@@ -117,340 +117,220 @@
                 </form>
                </div>
                 
-	<script>
-        $(function(){
+<script>
+    $(function(){
 
-			//点击右上角×号，返回第一个页面
-			$(".deletetitle").click(function(){
-				$(".right").load("theme/1/loadhtml/showSubjects.html");
-			})
-		//从数据库中获取选择框里要显示的数据
-			$.getJSON("manager/getAllSubjectType",function(data){
-				data.forEach(function(item){
-					var newOpt = '<option id="'+item.id+'" name="'+item.realName+'">'+item.realName+'</option>';
-					$(".Attributecontent_left").find("select[name='type']").append(newOpt);
-				});
+		//点击右上角×号，返回第一个页面
+		$(".deletetitle").click(function(){
+			$(".right").load("theme/1/loadhtml/showSubjects.html");
+		})
+	//从数据库中获取选择框里要显示的数据
+		$.getJSON("manager/getAllSubjectType",function(data){
+			data.forEach(function(item){
+				var newOpt = '<option id="'+item.id+'" name="'+item.realName+'">'+item.realName+'</option>';
+				$(".Attributecontent_left").find("select[name='type']").append(newOpt);
 			});
-			$.getJSON("manager/getAllDepartmentes",function(data){
-				data.forEach(function(item){
-					var newOpt = '<option id="'+item.id+'" name="'+item.name+'">'+item.name+'</option>';
-					$(".Attributecontent_left").find("select[name='department']").append(newOpt);
-				});
+		});
+		$.getJSON("manager/getAllDepartmentes",function(data){
+			data.forEach(function(item){
+				var newOpt = '<option id="'+item.id+'" name="'+item.name+'">'+item.name+'</option>';
+				$(".Attributecontent_left").find("select[name='department']").append(newOpt);
 			});
-			$.getJSON("manager/getAllSubjectLevel",function(data){
-				data.forEach(function(item){
-					var newOpt = '<option id="'+item.id+'" name="'+item.realName+'">'+item.realName+'</option>';
-					$(".Attributecontent_left").find("select[name='level']").append(newOpt);
-					
-				});			
+		});
+		$.getJSON("manager/getAllSubjectLevel",function(data){
+			data.forEach(function(item){
+				var newOpt = '<option id="'+item.id+'" name="'+item.realName+'">'+item.realName+'</option>';
+				$(".Attributecontent_left").find("select[name='level']").append(newOpt);
+				
+			});			
+		});
+		$.getJSON("manager/getAllTopics",function(data){
+			data.forEach(function(item){
+				// console.log(item["department_id"]);
+				var newOpt = '<option id="'+item.id+'" name="'+item.title+'" value="'+item["department_id"]+'">'+item.title+'</option>';
+				$(".Attributecontent_left").find("select[name='topic']").append(newOpt);
 			});
-			$.getJSON("manager/getAllTopics",function(data){
+		});
+		/*
+		//获取该方向的知识点
+		if(department_id){
+			$("select[name='topic']").empty();
+			$.getJSON("manager/getDepartmentTopics?id="+department_id,function(data){
 				data.forEach(function(item){
 					var newOpt = '<option id="'+item.id+'" name="'+item.title+'">'+item.title+'</option>';
 					$(".Attributecontent_left").find("select[name='topic']").append(newOpt);
 				});
 			});
-			/*
+		}*/
+	//获取所选中的option的id
+		var type_id=1;
+		var department_id=1;
+		var level_id=1;
+		var topic_id=1;
+	//添加点击事件
+		$(".Attributecontent_left").on("click","select",function(){
+			// console.log(this);
+			switch($(this).attr("name")){
+				case "type":type_id = $(this).find("option:selected").attr("id");
+					break;
+				case "department":department_id = $(this).find("option:selected").attr("id");
+					break;
+				case "level":level_id = $(this).find("option:selected").attr("id");
+					break;
+				case "topic":topic_id = $(this).find("option:selected").attr("id");
+					break;
+			}
+			// console.log(department_id);
+			// console.log(type_id,department_id,level_id,topic_id);
 			//获取该方向的知识点
 			if(department_id){
-				$("select[name='topic']").empty();
-				$.getJSON("manager/getDepartmentTopics?id="+department_id,function(data){
+				var topics = $("select[name='topic']").find("option").get();
+				topics.forEach(function(item){
+					if($(item).attr("value") == department_id){
+						$(item).show();
+					}else{
+						$(item).hide();
+					}
+				});
+				/*$.getJSON("manager/getDepartmentTopics?id="+department_id,function(data){
 					data.forEach(function(item){
 						var newOpt = '<option id="'+item.id+'" name="'+item.title+'">'+item.title+'</option>';
 						$(".Attributecontent_left").find("select[name='topic']").append(newOpt);
 					});
-				});
-			}*/
-		//获取所选中的option的id
-			var type_id=1;
-			var department_id=1;
-			var level_id=1;
-			var topic_id=1;
-		//将获取到的数据发送到后台获取数据库中数据
-			$(".Attributecontent_left").on("click","select",function(){
-				console.log(this);
-				switch($(this).attr("name")){
-					case "type":type_id = $(this).find("option:selected").attr("id");
-						break;
-					case "department":department_id = $(this).find("option:selected").attr("id");
-						break;
-					case "level":level_id = $(this).find("option:selected").attr("id");
-						break;
-					case "topic":topic_id = $(this).find("option:selected").attr("id");
-						break;
-				}
-				// console.log(department_id);
-				// console.log(type_id,department_id,level_id,topic_id);
-				//将input的类型随类型Select所选中的类型变化
-				switch(type_id){
-					case "1":$(".Answerpart_left").find("input").attr("type","radio");
-						$(".Answeroptions").removeAttr("hidden");
-						$(".Problem").eq(1).addClass("chapterAnswer");
-						break;
-					case "2":$(".Answerpart_left").find("input").attr("type","checkbox");
-						$(".Answeroptions").removeAttr("hidden");
-						$(".Problem").eq(1).addClass("chapterAnswer");
-						break;
-					case "3":$(".Answeroptions").attr("hidden","hidden");
-						$(".Problem").removeClass("chapterAnswer");
-						break;
-				}
-				console.log("onclick",type_id,department_id,level_id,topic_id);
-				
-			})
-
-		//点击添加选项添加选项
-			var n=0;
-			$(".icon_r").on("click",function(){
-				var num = String.fromCharCode(n+69);
-				var newDiv = $(".Answerpart").eq(0).clone();
-				newDiv.find(".Answerpart_left>p").html(num);
-				$(".Answercontent").append(newDiv);
-				console.log(newDiv);
-				n++;
-			})
-
-		//保存并继续
-			$(".btn_left").on("click",".btnL:first-child",function(){
-				// console.log(this);
-				// location.reload();
-				saveSubject();
-				// $(".right").load("theme/1/loadhtml/addSubject.html");
-
-			});
-			$(".btn_left").on("click",".btnL:last-child",function(){
-				// location.reload();
-
-			});
-			// arr.forEach(function(item){
-			// 	switch($(item).attr("name")){
-			// 		case "type":type_id = 
-			// 			break;
-			// 		case "department":
-			// 			break;
-			// 		case "level":
-			// 			break;
-			// 		case "topic":
-			// 			break;
-
-			// 	}
-			// });
-			
-		/*//从后台拿出来下拉列表中的内容
-			//获取题型数据
-			// $.getJSON("theme/json/types.json",function(data){
-			$.getJSON("manager/getAllSubjectType",function(data){
-				
-				$("select:eq(0)").empty();
-				data.forEach(function(item){
-					var opt = $("<option id='"+item['id']+"' value='"+item['id']+"' name='"+item['name']+"'>"+item['realName']+"</option>")
-					$(".Attributecontent_left select:eq(0)").append(opt);
-					})
-				})
-			//获取级别数据
-			// $.getJSON("theme/json/levels.json",function(data){
-			$.getJSON("manager/getAllSubjectLevel",function(data){
-				$("select:eq(2)").empty();
-				data.forEach(function(item){
-					var opt = $("<option id='"+item['id']+"' value='"+item['id']+"' name='"+item['name']+"'>"+item['realName']+"</option>")
-					$("select:eq(2)").append(opt);
-					})
-				})
-			
-			//获取方向数据
-			// $.getJSON("theme/json/departmentes.json",function(data){
-				 $.getJSON("manager/getAllDepartmentes",function(data){
-				$("select:eq(1)").empty();
-				data.forEach(function(item){
-					 var opt = $("<option id='"+item['id']+"' value='"+item['id']+"' name='"+item['name']+"'>"+item['name']+"</option>")
-					$("select:eq(1)").append(opt);
-					})
-					//方向加载完成后模拟click事件
-					$("select:eq(1)").children("option").eq(0).trigger("click");
-					// $("select:eq(1)").children("option").eq(1).attr("selected","selected");
-				})
-	//使用代理去绑定事件，事件代理，解决异步加载问题
-			$("select:eq(1)").on("click","option",function(event){
-				var  id =$(this).attr("id");
-				console.log(id);
-				var url ="manager/getDepartmentTopics?id="+id;
-				$.getJSON(url,function(data){
-					$("select:eq(3)").html("");
-					//console.log(data);
-					data.forEach(function(item){
-						//console.log(item.department.id==id);
-						//让方向和知识点id相等
-						var opt = $("<option id='"+item['id']+"' value='"+item['id']+"' name='"+item['title']+"'>"+item['title']+"</option>")
-						$("select:eq(3)").append(opt);
-						
-					})
-				})
-			})
-			//点击单选多选等select选项时相应的变化
-			//先解绑后再绑定事件
-			$(".Attributecontent_left select[name='type']").off("change");
-			$(".Attributecontent_left select[name='type']").on("change",function(event){
-				var val=$(this).val();
-					switch(val){
-					 //单选题
-					  case "1" :
-					$(".Answercontent").css("display","block");
-					$(".Answerpart .Answerpart_left input").attr("type","radio");
-					$(".Answercontent").removeAttr("hidden");
+				});*/
+			}
+			//将input的类型随类型Select所选中的类型变化
+			switch(type_id){
+				case "1":$(".Answerpart_left").find("input").attr("type","radio");
+					$(".Answeroptions").removeAttr("hidden");
+					$(".Problem").eq(1).addClass("chapterAnswer");
 					break;
-					  //复选题
-					  case "2" :
-					$(".Answercontent").css("display","block");
-					$(".Answerpart .Answerpart_left input").attr("type","checkbox");
-					$(".Answercontent").removeAttr("hidden");
-					  break;
-					  //简答题
-					  case "3" :
-					$(".Answeroptions").css("display","none");
-					$(".chapterAnswer").css("display","block");
-					  break;
-					 }
-			})
-			//保存并继续，将输入框中的内容提交到后台
-			$("form[name='subjectAddForm']").off("submit");
-			$("form[name='subjectAddForm']").on("submit",function(){
-				var type=$("select[name='type']").val();//拿到type  id
-				var department=$("select[name='department']").val();//拿到等级中的内容
-				var level=$("select[name='level']").val();//拿到难度等级内容
-				var topic=$("select[name='topic']").val();//拿到知识点的id
-				var stem=$("textarea[name='stem']").val();//题干信息
-				var analysis = $("textarea[name='analysis']").val();//答案解析
-				var choiceContents=new Array();
-				$("textarea[name='choiceContent']").each(function(index,item){
-					choiceContents[index]=$(item).val();
-					})
-				var correctChoices=new Array();
-				if(type==1){//单选
-					$(":radio[name='answer']").each(function(index,item){
-						correctChoices[index]=$(item).prop("checked");
-						})
-					}else{
-						$(":checkbox[name='answer']").each(function(index,item){
-							correctChoices[index]=$(item).prop('checked');
-							})
-						}
-					//console.log(type,department,level,topic,stem,analysis);
-					//console.log(choiceContents,correctChoices);
-					$.ajax("http://172.16.0.5:7777/test/exam/manager/saveSubject.action",{
-						method:"POST",
-						traditional:true,
-						data:{
-							"subject.department.id":department,
-							"subject.topic.id":topic,
-							"subject.subjectType.id":type,
-							"subject.subjectLevel.id":level,
-							"subject.stem":stem,
-							"subject.analysis":analysis,
-							"choiceContent":choiceContents,
-							"choiceCorrect":correctChoices	
-							},
-							success:function(data){
-								alert(data);
-								},
-							error:function(data){
-								}
-						});
-						return false;//阻止默认事件
-				});
-				
-				//保存并继续
-				$(".saveContinue").off("click");
-				$(".saveContinue").on("click",function(){
-					$("form[name='subjectAddForm']").trigger("submit");
-				});
-				//保存并关闭
-				$(".saveClose").off("click");
-				$(".saveClose").on("click",function(){
-					$(".deletetitle").trigger("submit");
-				})	*/				
+				case "2":$(".Answerpart_left").find("input").attr("type","checkbox");
+					$(".Answeroptions").removeAttr("hidden");
+					$(".Problem").eq(1).addClass("chapterAnswer");
+					break;
+				case "3":$(".Answeroptions").attr("hidden","hidden");
+					$(".Problem").removeClass("chapterAnswer");
+					break;
+			}
+			// console.log("onclick",type_id,department_id,level_id,topic_id);
 			
-        })
-      	function saveSubject(){
-      		var type_id;
-			var department_id;
-			var level_id;
-			var topic_id;
-			//获取题目题干
-      		var stem = $(".Attributetit").eq(1).siblings().find("textarea").val();
-      		var answer;
-      		var arrI = new Array();
-			var arrT = new Array();
-			var arrId = $(".Attributecontent_left").find("select").find("option:selected").get();
-			var analysis = $(".Problem").find("textarea[name='analysis']").val();
-			var checkState = "未审核";
-			var uploadTime = Date.now();
-			// console.log(analysis);
-			arrId.forEach(function(item){
-				switch($(item).parent().attr("name")){
-					case "type":type_id = $(item).attr("id");
-						break;
-					case "department":department_id = $(item).attr("id");
-						break;
-					case "level":level_id = $(item).attr("id");
-						break;
-					case "topic":topic_id = $(item).attr("id");
-						break;
+		})
+
+	//点击添加选项添加选项
+		var n=0;
+		$(".icon_r").on("click",function(){
+			var num = String.fromCharCode(n+69);
+			var newDiv = $(".Answerpart").eq(0).clone();
+			newDiv.find(".Answerpart_left>p").html(num);
+			$(".Answercontent").append(newDiv);
+			// console.log(newDiv);
+			n++;
+		})
+
+	//保存并继续
+		$(".btn_left").on("click",".btnL:first-child",function(){
+			// console.log(this);
+			// location.reload();
+			saveSubject();
+			$(".right").load("theme/1/loadhtml/addSubject.html");
+
+		});
+		$(".btn_left").on("click",".btnL:last-child",function(){
+			saveSubject();
+			$(".right").load("theme/1/loadhtml/showSubjects.html");
+		});
+	
+    })
+  	function saveSubject(){
+  		var type_id;
+		var department_id;
+		var level_id;
+		var topic_id;
+		//获取题目题干
+  		var stem = $(".Attributetit").eq(1).siblings().find("textarea").val();
+  		var answer;
+  		var arrI = new Array();
+		var arrT = new Array();
+		var arrId = $(".Attributecontent_left").find("select").find("option:selected").get();
+		var analysis = $(".Problem").find("textarea[name='analysis']").val();
+		var checkState = "未审核";
+		// var uploadTime = "";//Date.now().toString();
+		// console.log(analysis);
+		arrId.forEach(function(item){
+			switch($(item).parent().attr("name")){
+				case "type":type_id = $(item).attr("id");
+					break;
+				case "department":department_id = $(item).attr("id");
+					break;
+				case "level":level_id = $(item).attr("id");
+					break;
+				case "topic":topic_id = $(item).attr("id");
+					break;
+			}
+		})
+		//获取题目答案
+		if(type_id == "3"){
+			answer = $(".Problem").find("textarea[name='answer']").val();
+		}else{
+			var arrAn = $(".Answerpart_left").get();
+			arrAn.forEach(function(item){
+				// console.log($(item).find("input:checked"))
+
+				if($(item).find("input:checked").length){
+					arrI.push(1);
+					arrT.push($(item).siblings().eq(0).find("textarea").val());
+				}else{
+					arrI.push(0);
+					arrT.push($(item).siblings().eq(0).find("textarea").val());
+				}
+			});
+			// console.log(arrAnswer);
+			// console.log("arrI",arrI);
+			// console.log("arrI",arrT);
+		}
+		if(stem){
+			$.ajax("manager/saveSubject",{
+				method:"POST",
+				data:{
+					"department_id":department_id,
+					"subjectLevel_id":level_id,
+					"subjectType_id":type_id,
+					"topic_id":topic_id,
+					"stem":stem,
+					"answer":answer,
+					"analysis":analysis,
+					"checkState":checkState,
+					// "uploadTime":uploadTime,
+				},
+				success:function(data){
+					$.ajax("manager/saveChoice",{
+						method:"POST",
+						data:{
+							"subject_id":data.insertId,
+							"corrects":arrI,
+							"contents":arrT
+						},
+						success:function(result){
+							console.log(result);
+						}
+					})
 				}
 			})
-			//获取题目答案
-			if(type_id == "3"){
-				answer = $(".Problem").find("textarea[name='answer']").val();
-			}else{
-				var arrAn = $(".Answerpart_left").get();
-				arrAn.forEach(function(item){
-					// console.log($(item).find("input:checked"))
+		}else{
+			alert("请填写题目题干");
+		}
+		// console.log(answer);
+		// console.log(type_id,department_id,level_id,topic_id);
+  		
+  		// $.ajax("manager/saveSubject",{
+  		// 	method:"POST",
+  		// 	data:{
 
-					if($(item).find("input:checked").length){
-						arrI.push(1);
-						arrT.push($(item).siblings().eq(0).find("textarea").val());
-					}else{
-						arrI.push(0);
-						arrT.push($(item).siblings().eq(0).find("textarea").val());
-					}
-				});
-				// console.log(arrAnswer);
-				// console.log("arrI",arrI);
-				// console.log("arrI",arrT);
-			}
-			if(stem){
-				$.ajax("manager/saveSubject",{
-					method:"POST",
-					data:{
-						"department_id":department_id,
-						"subjectLevel_id":level_id,
-						"subjectType_id":type_id,
-						"topic_id":topic_id,
-						"stem":stem,
-						"answer":answer,
-						"analysis":analysis,
-						"checkState":checkState,
-						"uploadTime":uploadTime,
-						"corrects":arrI,
-						"contents":arrT
-					},
-					success:function(data){
-						console.log(data);
-					}
-				})
-			}else{
-				alert("请填写题目题干");
-			}
-			// console.log(answer);
-			// console.log(type_id,department_id,level_id,topic_id);
-      		
-      		// $.ajax("manager/saveSubject",{
-      		// 	method:"POST",
-      		// 	data:{
-
-      		// 	}
-      		// })
-      	}	
-    </script>
+  		// 	}
+  		// })
+  	}	
+</script>
     
     
     
