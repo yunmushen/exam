@@ -185,13 +185,19 @@
 			//获取该方向的知识点
 			if(department_id){
 				var topics = $("select[name='topic']").find("option").get();
-				topics.forEach(function(item){
+				topics.forEach(function(item,index){
 					if($(item).attr("value") == department_id){
 						$(item).show();
+						if(index==0 || index==5){
+							$(item).attr("selected","selected");
+						}
+						// console.log(item);
 					}else{
 						$(item).hide();
+						$(item).removeAttr("selected");
 					}
 				});
+
 				/*$.getJSON("manager/getDepartmentTopics?id="+department_id,function(data){
 					data.forEach(function(item){
 						var newOpt = '<option id="'+item.id+'" name="'+item.title+'">'+item.title+'</option>';
